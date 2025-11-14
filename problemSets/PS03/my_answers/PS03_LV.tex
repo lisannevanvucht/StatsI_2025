@@ -1,0 +1,344 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage{graphicx,textcomp}
+\usepackage{natbib}
+\usepackage{setspace}
+\usepackage{fullpage}
+\usepackage{color}
+\usepackage[reqno]{amsmath}
+\usepackage{amsthm}
+\usepackage{fancyvrb}
+\usepackage{amssymb,enumerate}
+\usepackage[all]{xy}
+\usepackage{endnotes}
+\usepackage{lscape}
+\newtheorem{com}{Comment}
+\usepackage{float}
+\usepackage{hyperref}
+\newtheorem{lem} {Lemma}
+\newtheorem{prop}{Proposition}
+\newtheorem{thm}{Theorem}
+\newtheorem{defn}{Definition}
+\newtheorem{cor}{Corollary}
+\newtheorem{obs}{Observation}
+\usepackage[compact]{titlesec}
+\usepackage{dcolumn}
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\usepackage{multirow}
+\usepackage{xcolor}
+\newcolumntype{.}{D{.}{.}{-1}}
+\newcolumntype{d}[1]{D{.}{.}{#1}}
+\definecolor{light-gray}{gray}{0.65}
+\usepackage{url}
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+	backgroundcolor=\color{backcolour},   
+	commentstyle=\color{codegreen},
+	keywordstyle=\color{magenta},
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{codepurple},
+	basicstyle=\footnotesize,
+	breakatwhitespace=false,         
+	breaklines=true,                 
+	captionpos=b,                    
+	keepspaces=true,                 
+	numbers=left,                    
+	numbersep=5pt,                  
+	showspaces=false,                
+	showstringspaces=false,
+	showtabs=false,                  
+	tabsize=2
+}
+\lstset{style=mystyle}
+\newcommand{\Sref}[1]{Section~\ref{#1}}
+\newtheorem{hyp}{Hypothesis}
+
+\title{Problem Set 3}
+\date{Due: November 13, 2025}
+\author{Lisanne van Vucht}
+
+
+\begin{document}
+	\maketitle
+	\section*{Instructions}
+	\begin{itemize}
+		\item Please show your work! You may lose points by simply writing in the answer. If the problem requires you to execute commands in \texttt{R}, please include the code you used to get your answers. Please also include the \texttt{.R} file that contains your code. If you are not sure if work needs to be shown for a particular problem, please ask.
+	\item Your homework should be submitted electronically on GitHub.
+	\item This problem set is due before 23:59 on Thursday November 13, 2025. No late assignments will be accepted.
+
+	\end{itemize}
+
+		\vspace{.25cm}
+	
+\noindent In this problem set, you will run several regressions and create an add variable plot (see the lecture slides) in \texttt{R} using the \texttt{incumbents\_subset.csv} dataset. Include all of your code.
+
+	\vspace{.5cm}
+\section*{Question 1}
+\vspace{.25cm}
+\noindent We are interested in knowing how the difference in campaign spending between incumbent and challenger affects the incumbent's vote share. 
+	\begin{enumerate}
+		\item Run a regression where the outcome variable is \texttt{voteshare} and the explanatory variable is \texttt{difflog}.
+		
+			\begin{BVerbatim}
+head(inc.sub)
+str(inc.sub)
+regression1 <- lm(voteshare ~ difflog, data = inc.sub)
+summary(regression1)
+		\end{BVerbatim}
+		
+		\vspace{2cm}
+		\item Make a scatterplot of the two variables and add the regression line. 	
+		
+		\begin{BVerbatim}
+ggplot(data = inc.sub, aes(x = difflog, 
+y = voteshare)) + 
+geom_point(size = 0.5, shape = 22) + 
+geom_smooth(method = lm, color = "pink") + 
+labs(title = "Association between Campaign 
+Spending Difference and Incumbent Vote Share", 
+x = "campaign spending", 
+y = "incumbents vote share") + 
+theme_bw()
+		\end{BVerbatim}
+			
+				\includegraphics[width=0.9\textwidth]{/Users/lisannevanvucht/Documents/TCD/Quants I/PS/PS03/campaign_vote.png}
+			
+		\item Save the residuals of the model in a separate object.	\vspace{1cm}
+		
+		\begin{BVerbatim}
+residuals1 <- regression1$residuals
+residuals1
+		\end{BVerbatim}
+		
+		\item Write the prediction equation.
+		
+		\begin{BVerbatim}
+summary(regression1)
+		\end{BVerbatim}
+		
+This summary gives us the following coefficients: 
+		
+		\begin{BVerbatim}
+Coefficients:
+Estimate Std. Error t value Pr(>|t|)    
+(Intercept) 0.579031   0.002251  257.19   <2e-16 ***
+difflog     0.041666   0.000968   43.04   <2e-16 ***
+		\end{BVerbatim}
+		
+		
+We can now write the prediction equation $\gamma$ = $\alpha$ + $\beta$*x.
+		
+		 Incumbent vote share = intercept + slope * difflog
+		 
+		 Incumbent vote share = 0.579031 + 0.041666 * difflog
+		 
+	
+		\textbf{On average, for every one-unit increase of the explanatory variable "difflog" which is campagin spending, the output variable "Incumbent vote share" increases by 0.041666. }
+		
+	\end{enumerate}
+
+\section*{Question 2}
+\noindent We are interested in knowing how the difference between incumbent and challenger's spending and the vote share of the presidential candidate of the incumbent's party are related.	\vspace{.25cm}
+	\begin{enumerate}
+		\item Run a regression where the outcome variable is \texttt{presvote} and the explanatory variable is \texttt{difflog}.
+
+How is the difference in spending related to the presidential candidates vote share?		
+
+			\begin{BVerbatim}
+regression2 <- lm(presvote ~ difflog, data = inc.sub)
+summary(regression2)
+			\end{BVerbatim}
+
+		\item Make a scatterplot of the two variables and add the regression line. 	
+		
+			\begin{BVerbatim}
+ggplot(data = inc.sub, aes(x = difflog, y = presvote)) + 
+geom_point(size = 0.5, shape = 22) + 
+geom_smooth(method = lm, color = "lightblue") + 
+labs(title = "Association between Campaign Spending Difference 
+and Presidential Vote Share", 
+x = "Campaign spending", 
+y = "Voteshare presidential candidates") + 
+theme_bw()
+		\end{BVerbatim}
+		
+			\includegraphics[width=0.9\textwidth]{/Users/lisannevanvucht/Documents/TCD/Quants I/PS/PS03/spending_vote.png}
+		
+		\item Save the residuals of the model in a separate object.	\vspace{0.5cm}
+
+			\begin{BVerbatim}
+residuals2 <- regression2$residuals
+residuals2
+		\end{BVerbatim}
+		\item Write the prediction equation.\vspace{0.5cm}
+
+To find the prediction equation, we need to find the relevant coefficients: 
+
+			\begin{BVerbatim}
+summary(regression2)
+Coefficients:
+Estimate Std. Error t value Pr(>|t|)    
+(Intercept) 0.507583   0.003161  160.60   <2e-16 ***
+difflog     0.023837   0.001359   17.54   <2e-16 ***
+		\end{BVerbatim}
+		
+	
+We can now write the prediction equation $\gamma$ = $\alpha$ + $\beta$*x.
+	
+presidential candidate vote share = intercept + slope * difflog\vspace{0.5cm}
+presidential candidate vote share = 0.507583 + 0.023837 * difflog
+
+\textbf{In other words, on average, for every one-unit increase of the explanatory variable "difflog", which is campagin spending, the output variable "voteshare presidential candidate" increases by 0.023837. 	}
+
+
+	\end{enumerate}
+	
+	\newpage	
+\section*{Question 3}
+
+\noindent We are interested in knowing how the vote share of the presidential candidate of the incumbent's party is associated with the incumbent's electoral success.
+	\vspace{.25cm}
+	\begin{enumerate}
+		\item Run a regression where the outcome variable is \texttt{voteshare} and the explanatory variable is \texttt{presvote}.\vspace{1cm}
+		
+		\begin{BVerbatim}
+regression3 <- lm(voteshare ~ presvote, data = inc.sub)
+summary(regression3)
+		\end{BVerbatim}
+
+		\item Make a scatterplot of the two variables and add the regression line. 
+		
+	\begin{BVerbatim}
+ggplot(data = inc.sub, aes(x = presvote, y = voteshare)) + 
+geom_point(size = 0.5, shape = 2) + 
+geom_smooth(method = lm, color = "green") + 
+labs(title = "Association between Presidential and Incumbent Vote Share ", 
+x = "Voteshare presidential candidates", 
+y = "Voteshare incumbent presidents' party") + 
+theme_bw()
+	\end{BVerbatim}
+	
+		\includegraphics[width=0.9\textwidth]{/Users/lisannevanvucht/Documents/TCD/Quants I/PS/PS03/presvote_scatter.png}
+	
+			\vspace{5cm}
+		\item Write the prediction equation.
+	\end{enumerate}
+	To make the prediction equation, we need to find the relevant coefficients.
+	
+	\begin{BVerbatim}
+regression3
+	\end{BVerbatim}
+	We get the following coefficients: 
+	
+	\begin{BVerbatim}
+Coefficients:
+Coefficients:
+Estimate Std. Error t value Pr(>|t|)    
+(Intercept) 0.441330   0.007599   58.08   <2e-16 ***
+presvote    0.388018   0.013493   28.76   <2e-16 ***
+---
+	\end{BVerbatim}
+
+We can now write the prediction equation $\gamma$ = $\alpha$ + $\beta$*x.
+\newline Voteshare incumbent presidents' party = Intercept + slope * voteshare presidential candidate
+\newline Voteshare incumbent presidents' party = 0.4413 + 0.3880*Voteshare presidential candidate
+
+\textbf{On average, for every one-unit increase of the explanatory variable "presvote" which is  the incumbents electoral success, the output variable "voteshare", which is the vote share of the presidential candidate of the incumbent's party, increases by 0.3880. }
+	
+
+\newpage	
+\section*{Question 4}
+\noindent The residuals from part (a) tell us how much of the variation in \texttt{voteshare} is $not$ explained by the difference in spending between incumbent and challenger. The residuals in part (b) tell us how much of the variation in \texttt{presvote} is $not$ explained by the difference in spending between incumbent and challenger in the district.
+	\begin{enumerate}
+		\item Run a regression where the outcome variable is the residuals from Question 1 and the explanatory variable is the residuals from Question 2.
+		
+\begin{BVerbatim}
+dataframe <- data.frame(residuals_1 = residuals1, residuals_2 = residuals2)
+regression4 <- lm(residuals_1 ~ residuals_2, data = dataframe)
+\end{BVerbatim}
+
+		\item Make a scatterplot of the two residuals and add the regression line. 	
+
+\begin{BVerbatim}
+ggplot(data = dataframe, aes(x = residuals_2, y = residuals_1)) + 
+geom_point(size = 2, shape = 2) + 
+geom_smooth(method = lm, color = "green") + 
+labs(title = "Association between Residuals of Presidential and Incument Models", 
+x = "residuals 2", 
+y = "residuals 1") + 
+theme_bw()
+
+\end{BVerbatim}
+
+	\includegraphics[width=0.9\textwidth]{/Users/lisannevanvucht/Documents/TCD/Quants I/PS/PS03/residuals_scatter.png}
+	
+	\newpage
+		\item Write the prediction equation.
+	\end{enumerate}
+	
+To make the prediction equation, we need to find the relevant coefficients. 
+
+\begin{BVerbatim}
+	
+regression4
+
+\end{BVerbatim}
+
+We get the following coefficients: 
+
+\begin{BVerbatim}
+	
+Coefficients:
+(Intercept)  residuals_2  
+-1.942e-18    2.569e-01  
+
+\end{BVerbatim}
+
+We can now write the prediction equation $\gamma$ = $\alpha$ + $\beta$*x.
+\newline Residuals2 = Intercept + slope * residuals1
+\newline Residuals2	 = 0 + 0.256 * residuals1
+
+
+\textbf{On average, for every one-unit increase of "residuals1" the output variable "residuals2" increases by 0.3880. }
+
+\section*{Question 5}
+\noindent What if the incumbent's vote share is affected by both the president's popularity and the difference in spending between incumbent and challenger? 
+\begin{enumerate}
+	\item Run a regression where the outcome variable is the incumbent's \texttt{voteshare} and the explanatory variables are \texttt{difflog} and \texttt{presvote}.
+	
+	\begin{BVerbatim}
+regression5 <- lm(voteshare ~ difflog + presvote, data = inc.sub)
+summary(regression5)
+	\end{BVerbatim}
+	
+	This gives us the following coefficients: 
+	
+	\begin{BVerbatim}
+Coefficients:
+Estimate Std. Error t value            Pr(>|t|)    
+(Intercept) 0.4486442  0.0063297   70.88 <0.0000000000000002 ***
+difflog     0.0355431  0.0009455   37.59 <0.0000000000000002 ***
+presvote    0.2568770  0.0117637   21.84 <0.0000000000000002 ***
+	\end{BVerbatim}
+	
+	
+	\item Write the prediction equation.	\vspace{.5 cm}
+	
+	We can now write the prediction equation $\gamma$ = $\alpha$ + $\beta$*x.
+	\newline Voteshare = Intercept + $\beta_1$ * difflog + $\beta_2$ * presvote
+	\newline Voteshare	 = 0.448 + 0.035 * difflog + 0.256 * presvote
+	
+	
+	
+	\item What is it in this output that is identical to the output in Question 4? Why do you think this is the case?
+\end{enumerate}
+
+\textbf{The coefficients of "presvote" in regressions 4 and 5 are the same because both regressions answer the same question in two diffrerent ways: how much the presidents' voteshare influences voteshare for incumbent president if account for campaign spending.}
+\end{document}
